@@ -1,6 +1,6 @@
 # Gynecologist Assistant AI
 
-A specialized AI chatbot to provide gynecology-related information and assistance using Google's Gemini model and the Chainlit framework.
+A specialized AI chatbot providing gynecology-related information and assistance using Google's Gemini model and the Chainlit framework.
 
 ![Gynecologist Assistant](https://api.placeholder.com/800/400)
 
@@ -23,8 +23,8 @@ A specialized AI chatbot to provide gynecology-related information and assistanc
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/gyno-assistant.git
-   cd gyno-assistant
+   git clone https://github.com/narayan-github/stunning-palm-tree.git
+   cd stunning-palm-tree
    ```
 
 2. **Set up a virtual environment**
@@ -59,12 +59,11 @@ The application will be available at `http://localhost:8000` by default.
 ```
 ├── app.py                 # Main application file
 ├── system_prompt.py       # System prompts for the AI assistant
-├── schemas.py             # Pydantic schemas for structured data
 ├── chainlit.md            # Welcome message for Chainlit
-├── chainlit.config.toml   # Chainlit configuration
 ├── requirements.txt       # Python dependencies
 ├── public/                # Public assets
-│   ├── custom.css         # Custom CSS styles
+│   ├── css/               # CSS files
+│   │   └── custom.css     # Custom CSS styles
 │   └── elements/          # Custom React components
 │       └── SymptomChecker.jsx  # Symptom checker component
 └── .env                   # Environment variables (not tracked in git)
@@ -76,7 +75,6 @@ The application will be available at `http://localhost:8000` by default.
 
 - **app.py**: Main Chainlit application with chat handlers and Gemini integration
 - **system_prompt.py**: Contains prompts that shape the AI's personality and responses
-- **schemas.py**: Pydantic models for structured data validation
 
 ### Frontend (React & CSS)
 
@@ -126,7 +124,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 - [Chainlit](https://github.com/Chainlit/chainlit) for the chat interface framework
 - [Google Gemini API](https://ai.google.dev/) for the AI model
-- [ZZWICK Hygiene](https://example.com) for project sponsorship
 
 ---
 

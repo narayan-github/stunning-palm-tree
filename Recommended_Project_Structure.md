@@ -1,25 +1,15 @@
 # Recommended Project Structure
 
-I recommend reorganizing your files into the following structure for better maintainability:
+For better maintainability, I recommend reorganizing your files into the following structure:
 
 ```
-gynecologist-assistant/
-├── app.py                       # Renamed from testapp.py, main application entry point
+stunning-palm-tree/
+├── app.py                       # Main application entry point
 ├── .env                         # Environment variables (not tracked in git)
 ├── .env.example                 # Example environment variables for documentation
 ├── requirements.txt             # Python dependencies
 ├── README.md                    # Project documentation
-├── LICENSE                      # Project license file
-│
-├── chainlit_config/             # Chainlit configuration files
-│   ├── chainlit.md              # Welcome message for Chainlit
-│   └── chainlit.config.toml     # Chainlit configuration
-│
-├── src/                         # Source code for the application
-│   ├── __init__.py              # Make the directory a Python package
-│   ├── prompts.py               # Renamed from system_prompt.py
-│   ├── schemas.py               # Data schemas
-│   └── utils.py                 # Utility functions
+├── LICENSE                      # MIT License file
 │
 ├── public/                      # Public assets
 │   ├── css/                     # CSS files
@@ -27,25 +17,41 @@ gynecologist-assistant/
 │   └── elements/                # Custom React components
 │       └── SymptomChecker.jsx   # Symptom checker component
 │
-└── tests/                       # Test files (to be added)
+├── src/                         # Source code for the application
+│   ├── __init__.py              # Make the directory a Python package
+│   ├── prompt_manager.py        # Manage system prompts
+│   └── utils.py                 # Utility functions
+│
+└── tests/                       # Test files
     └── __init__.py              # Make the directory a Python package
 ```
 
-## Changes Made:
+## Implementation Steps:
 
-1. **Renamed Files**:
-   - `testapp.py` → `app.py` (more descriptive and standard name)
-   - `system_prompt.py` → `src/prompts.py` (better organized)
+1. **Create Directory Structure**:
+   ```bash
+   mkdir -p public/css public/elements src tests
+   touch src/__init__.py tests/__init__.py .env.example LICENSE
+   ```
 
-2. **New Directories**:
-   - `src/` - Contains all Python source code
-   - `chainlit_config/` - Groups Chainlit configuration files
-   - `public/css/` - Better organization for CSS files
-   - `tests/` - For future test files
+2. **Move Files**:
+   ```bash
+   # Move existing files
+   mv custom.css public/css/
+   mv SymptomChecker.jsx public/elements/
+   mv system_prompt.py src/prompt_manager.py
+   ```
 
-3. **Added Files**:
-   - `.env.example` - Template for environment variables
-   - `LICENSE` - For open-source licensing
-   - `src/utils.py` - For utility functions that may be needed in the future
+3. **Create .env.example**:
+   ```
+   # Required for API access
+   GEMINI_API_KEY=your_api_key_here
+   
+   # Optional configuration
+   PORT=8000
+   ```
 
-This structure follows standard Python project organization and will make it easier to maintain and extend the application as it grows.
+4. **Add LICENSE File**:
+   Create a standard MIT License file
+
+This structure follows modern Python project conventions and will make your codebase more maintainable as it grows. It also clearly separates frontend assets from backend code, making it easier for developers to collaborate on different aspects of the project.
