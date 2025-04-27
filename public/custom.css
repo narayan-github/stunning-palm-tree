@@ -1,11 +1,9 @@
 /* custom.css */
-/* To further customize the UI, you can create a custom.css file */
-
-/* Place this in a 'public' folder in your project directory */
+/* To further customize the UI */
 
 /* Make input box more prominent */
 .cl-input-box {
-  border: 2px solid #4F46E5;
+  border: 2px solid #E91E63;
   border-radius: 8px;
 }
 
@@ -25,7 +23,7 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #4F46E5;
+  background: #E91E63;
   border-radius: 4px;
 }
 
@@ -36,7 +34,7 @@
   padding: 12px;
 }
 
-/* Style the custom symptom buttons */
+/* Style the custom buttons */
 .cl-custom-element button {
   transition: all 0.2s ease;
 }
@@ -48,12 +46,40 @@
 
 /* Style file upload area */
 .cl-upload-droparea {
-  border: 2px dashed #4F46E5;
+  border: 2px dashed #E91E63;
   border-radius: 8px;
   padding: 16px;
   transition: all 0.2s ease;
 }
 
 .cl-upload-droparea:hover {
-  background-color: rgba(79, 70, 229, 0.05);
+  background-color: rgba(233, 30, 99, 0.05);
+}
+
+/* Doctor advice styling */
+.cl-message-content strong {
+  color: #E91E63;
+}
+
+/* Style the question cards */
+.cl-custom-element .card {
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Style the doctor advice section */
+.doctor-advice {
+  background-color: #fdf8fa;
+  border-left: 4px solid #E91E63;
+  padding: 12px 16px;
+  margin: 16px 0;
+  border-radius: 4px;
+}
+
+/* Style the heading for advice */
+.doctor-advice-heading {
+  font-weight: 600;
+  color: #E91E63;
+  margin-bottom: 8px;
+  font-size: 18px;
 }

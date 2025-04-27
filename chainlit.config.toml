@@ -7,20 +7,23 @@ name = "Gynecologist Assistant"
 # Enable chat history
 chat_history = true
 # Enable file uploads
-multi_modal = true
+multi_modal = false
 
 [ui]
 name = "Gynecologist Assistant"
-description = "Your personal AI powered by Gemini"
+description = "Your personal AI gynecology assistant powered by Gemini"
 show_footer = true
-footer_text = "Powered by ZZWICK Hygiene."
+footer_text = "Powered by ZZWICK Hygiene. Not a substitute for professional medical advice."
 
 [ui.theme]
-primary_color = "#4F46E5"
+primary_color = "#E91E63" # A more feminine/medical pink color
 
 [ui.github]
-show_github = false
+show_github = true
 
 # Enable file uploads
 [ui.input]
-disable_file_upload = false
+disable_file_upload = true
+
+[UI]
+custom_css = './public/custom.css'
