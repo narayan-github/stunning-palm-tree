@@ -1,0 +1,33 @@
+# chainlit.config.toml
+
+[project]
+# Project name displayed in the UI
+name = "Gynecologist Assistant"
+
+[features]
+# Disable chat history sidebar
+chat_history = false
+
+# Disable file uploads
+multi_modal = false
+
+[ui]
+# Customize the chat interface
+name = "Gynecologist Assistant"
+description = "Your personal AI powered by Gemini"
+
+# Change default Chainlit branding
+show_footer = true
+footer_text = "Powered by ZZWICK Hygiene."
+
+# Theme customization
+[ui.theme]
+primary_color = "#4F46E5"
+
+# Disable GitHub link
+[ui.github]
+show_github = false
+
+# Disable file attachment button
+[ui.input]
+disable_file_upload = true

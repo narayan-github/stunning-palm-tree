@@ -1,0 +1,35 @@
+/* To further customize the UI, you can create a custom.css file */
+/* Place this in a 'public' folder in your project directory */
+
+/* Make input box more prominent */
+.cl-input-box {
+  border: 2px solid #4F46E5;
+  border-radius: 8px;
+}
+
+/* Style messages */
+.cl-message-content {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4F46E5;
+  border-radius: 4px;
+}
+
+/* Custom styling for code blocks */
+.cl-message-content pre {
+  background-color: #2d2d2d;
+  border-radius: 6px;
+  padding: 12px;
+}
