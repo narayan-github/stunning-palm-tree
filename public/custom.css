@@ -1,4 +1,6 @@
+/* custom.css */
 /* To further customize the UI, you can create a custom.css file */
+
 /* Place this in a 'public' folder in your project directory */
 
 /* Make input box more prominent */
@@ -32,4 +34,26 @@
   background-color: #2d2d2d;
   border-radius: 6px;
   padding: 12px;
+}
+
+/* Style the custom symptom buttons */
+.cl-custom-element button {
+  transition: all 0.2s ease;
+}
+
+.cl-custom-element button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Style file upload area */
+.cl-upload-droparea {
+  border: 2px dashed #4F46E5;
+  border-radius: 8px;
+  padding: 16px;
+  transition: all 0.2s ease;
+}
+
+.cl-upload-droparea:hover {
+  background-color: rgba(79, 70, 229, 0.05);
 }
