@@ -1,185 +1,207 @@
-# app.py
+"""
+Gynecologist Assistant AI - Main Application File
+-------------------------------------------------
+This is the main entry point for the Chainlit-based chatbot that provides
+gynecology-related information and assistance using Google's Gemini model.
+"""
+
+import os
+import re
+from typing import Dict, Any
 
 import chainlit as cl
 from google import genai
-import os
-from dotenv import load_dotenv
-import logging
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# Load environment variables
-load_dotenv()
-
-# Get API key with better error handling
-api_key = os.getenv("GEMINI_API_KEY")
-if not api_key:
-    logger.error("No API key found. Please set GEMINI_API_KEY in your .env file")
-    raise ValueError("GEMINI_API_KEY environment variable not set")
-
-# Configure Gemini API
-try:
-    client = genai.Client(api_key=api_key)
-    logger.info("Gemini client initialized successfully")
-except Exception as e:
-    logger.error(f"Failed to initialize Gemini client: {e}")
-    raise
-
-# Setup the model
-model_name = "gemini-2.0-flash"
+from google.genai import types
+from system_prompt import get_system_prompt
 
 
-# Function to display the symptom checker widget
-async def show_symptom_checker():
-    symptom_checker = cl.CustomElement(name="SymptomChecker")
-    await cl.Message(
-        content="I'm here to help! You can click on any symptoms you're experiencing below, or describe them in your own words.",
-        author="AI Assistant",
-        elements=[symptom_checker]
-    ).send()
+# Initialize Gemini client
+def initialize_gemini():
+    """Initialize the Google Gemini API client with API key from environment variables"""
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        raise ValueError("GEMINI_API_KEY environment variable is not set!")
+    return genai.Client(api_key=api_key)
+
+
+# Create global client instance
+client = initialize_gemini()
 
 
 @cl.on_chat_start
 async def start():
-    logger.info("New chat session started")
+    """Initialize the chat session and display the symptom checker"""
+    # Display the symptom checker custom element
+    symptom_checker = cl.CustomElement(name="SymptomChecker")
 
-    # Initialize chat history
-    cl.user_session.set("chat_history", [])
-
-    # Send a welcome message
-    welcome_message = "Welcome to your Gynecologist Assistant! How can I help you today?"
     await cl.Message(
-        content=welcome_message,
-        author="AI Assistant"
+        content="Hello! I'm here to assist you with any gynecology-related questions or concerns you may have. "
+                "Your privacy is important, and all information shared is confidential. "
+                "Please use the symptom checker below to help me understand your concerns better.",
+        elements=[symptom_checker]
     ).send()
 
-    # Add the welcome message to chat history
-    chat_history = cl.user_session.get("chat_history")
-    chat_history.append({"role": "assistant", "content": welcome_message})
-    cl.user_session.set("chat_history", chat_history)
 
-    # Show the symptom checker
-    await show_symptom_checker()
+def extract_structured_info(message_content: str) -> Dict[str, Any]:
+    """
+    Extract structured information from the symptom checker output
 
-    # Inform about file upload capability
+    Parameters:
+        message_content (str): The message content from the symptom checker
+
+    Returns:
+        Dict[str, Any]: Structured information including symptoms and personal details
+    """
+    structured_info = {
+        "symptoms": [],
+        "age": None,
+        "height": None,
+        "weight": None,
+        "last_period": None,
+        "additional_info": None
+    }
+
+    # Extract symptoms
+    symptoms_match = re.search(r"I'm experiencing the following symptoms:\s*(.+?)(?:\n\n|$)", message_content,
+                               re.DOTALL)
+    if symptoms_match:
+        symptoms_text = symptoms_match.group(1).strip()
+        structured_info["symptoms"] = [s.strip() for s in symptoms_text.split(",")]
+
+    # Extract personal information
+    age_match = re.search(r"Age:\s*(.+?)(?:\n|$)", message_content)
+    if age_match:
+        structured_info["age"] = age_match.group(1).strip()
+
+    height_match = re.search(r"Height:\s*(.+?)(?:\n|$)", message_content)
+    if height_match:
+        structured_info["height"] = height_match.group(1).strip()
+
+    weight_match = re.search(r"Weight:\s*(.+?)(?:\n|$)", message_content)
+    if weight_match:
+        structured_info["weight"] = weight_match.group(1).strip()
+
+    period_match = re.search(r"Last period date:\s*(.+?)(?:\n|$)", message_content)
+    if period_match:
+        structured_info["last_period"] = period_match.group(1).strip()
+
+    # Extract additional information
+    additional_info_match = re.search(r"Additional information:\s*(.+?)(?:\n\n|$)", message_content, re.DOTALL)
+    if additional_info_match:
+        structured_info["additional_info"] = additional_info_match.group(1).strip()
+
+    return structured_info
+
+
+async def process_structured_input(structured_info: Dict[str, Any]) -> None:
+    """
+    Process structured input from the symptom checker and generate a response
+
+    Parameters:
+        structured_info (Dict[str, Any]): Structured information from the symptom checker
+    """
+    # Acknowledge receipt of the information
     await cl.Message(
-        content="If you have any medical documents to share, you can type 'upload file' and I'll help you process them.",
-        author="AI Assistant"
+        content="Thank you for providing this detailed information. I'll analyze your symptoms and provide guidance."
     ).send()
+
+    # Create a detailed prompt for the AI
+    prompt = f"""
+    The user has shared the following information about their gynecological health:
+
+    Symptoms: {', '.join(structured_info['symptoms'])}
+    Age: {structured_info['age']}
+    Height: {structured_info['height']}
+    Weight: {structured_info['weight']}
+    Last menstrual period: {structured_info['last_period']}
+
+    Additional information: {structured_info['additional_info'] or 'None provided'}
+
+    As a gynecologist assistant AI, please respond
+
+    Be empathetic, informative, and remember to emphasize that this is not a substitute for professional medical evaluation.
+    """
+
+    # Send processing message
+    await cl.Message(content="Analyzing your information...").send()
+
+    # Generate response
+    response1 = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=prompt,
+        config = types.GenerateContentConfig(
+            max_output_tokens=200,
+            temperature=0.1
+        )
+    )
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=response1.text+'" modify the above text to remove all the doctor recomendations type texts  and should not be considered medical advice kind of text from it and make it less intimidate. and keep the modified text and add the possible causes and information.Suggest safe, general advice (e.g., hygiene tips, routine habits).',
+        config=types.GenerateContentConfig(
+            max_output_tokens=400,
+            temperature=0.1
+        )
+    )
+
+    await cl.Message(content=response.text).send()
+
+
+async def process_regular_chat(message_content: str) -> None:
+    """
+    Process regular chat messages that are not from the symptom checker
+
+    Parameters:
+        message_content (str): The content of the user's message
+    """
+    # Use the system prompt to guide the model's response
+    system_prompt = get_system_prompt()
+
+    prompt = f"""
+    {system_prompt}
+
+    The user said: "{message_content}"
+
+    Provide a helpful, accurate, and empathetic response.
+    Focus on giving medically sound information, but remind the user to consult a healthcare
+    professional for proper diagnosis and treatment.
+    
+    """
+
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=prompt,
+        config = types.GenerateContentConfig(
+            max_output_tokens=500,
+            temperature=0.1
+        )
+    )
+
+    await cl.Message(content=response.text).send()
 
 
 @cl.on_message
-async def main(message: cl.Message):
-    # Get user input
-    user_message = message.content
-    logger.info(f"Received user message: {user_message[:30]}...")
+async def on_message(message: cl.Message):
+    """
+    Handle incoming messages from the user
 
-    # Get chat history
-    chat_history = cl.user_session.get("chat_history")
+    Parameters:
+        message (cl.Message): The message object from Chainlit
+    """
+    msg_content = message.content
 
-    # Add user message to chat history
-    chat_history.append({"role": "user", "content": user_message})
-    cl.user_session.set("chat_history", chat_history)
+    # Check if this is structured information from the symptom checker
+    is_structured = "I'm experiencing the following symptoms:" in msg_content
 
-    # Check if this is a file upload request
-    if user_message.lower() == "upload file":
-        files = await cl.AskFileMessage(
-            content="Please upload a text file with your medical information.",
-            accept=["text/plain"],
-            max_size_mb=2,
-            max_files=1
-        ).send()
+    if is_structured:
+        # Extract and process structured information
+        structured_info = extract_structured_info(msg_content)
+        await process_structured_input(structured_info)
+    else:
+        # Handle regular chat messages
+        await process_regular_chat(msg_content)
 
-        if files:
-            file = files[0]  # Get the first file
-            try:
-                # Read file content
-                with open(file.path, "r") as f:
-                    content = f.read()
 
-                # Send acknowledgment message
-                ack_message = f"I've received your file '{file.name}'. It contains {len(content)} characters. Let me analyze it."
-                await cl.Message(content=ack_message, author="AI Assistant").send()
-
-                # Add acknowledgment to chat history
-                chat_history.append({"role": "assistant", "content": ack_message})
-
-                # Create empty message for streaming analysis
-                analysis_msg = cl.Message(content="", author="AI Assistant")
-                await analysis_msg.send()
-
-                # Generate response about the file using correct streaming method
-                prompt = f"This is a medical document from a patient seeking gynecological advice. The document contains: {content}\n\nPlease analyze this document and provide helpful, professional insights."
-
-                # Use the correct streaming method
-                response = client.models.generate_content_stream(
-                    model=model_name,
-                    contents=prompt
-                )
-
-                # Stream the analysis
-                analysis_text = ""
-                for chunk in response:
-                    if hasattr(chunk, 'text') and chunk.text:
-                        await analysis_msg.stream_token(chunk.text)
-                        analysis_text += chunk.text
-
-                # Add to chat history
-                chat_history.append({"role": "assistant", "content": analysis_text})
-                cl.user_session.set("chat_history", chat_history)
-
-            except Exception as e:
-                error_msg = f"Sorry, I couldn't process your file: {str(e)}"
-                error_message = cl.Message(content=error_msg, author="AI Assistant")
-                await error_message.send()
-
-                # Add error to chat history
-                chat_history.append({"role": "assistant", "content": error_msg})
-                cl.user_session.set("chat_history", chat_history)
-        return
-
-    # Create an empty message for streaming (implements typing indicator)
-    msg = cl.Message(content="", author="AI Assistant")
-    await msg.send()
-
-    try:
-        logger.info(f"Calling Gemini API with model: {model_name}")
-
-        # Add context from chat history
-        formatted_history = "\n".join([f"{m['role']}: {m['content']}" for m in chat_history[-5:]])
-        full_prompt = f"You are a helpful gynecologist assistant. Provide accurate, professional, and empathetic responses.\n\nConversation history:\n{formatted_history}\n\nUser's latest question: {user_message}\n\nYour response:"
-
-        # Generate response using Gemini with the correct streaming method
-        response = client.models.generate_content_stream(
-            model=model_name,
-            contents=full_prompt
-        )
-
-        # Initialize response text
-        response_text = ""
-
-        # Stream the response tokens as they come
-        for chunk in response:
-            if hasattr(chunk, 'text') and chunk.text:
-                await msg.stream_token(chunk.text)
-                response_text += chunk.text
-
-        # Add to chat history
-        chat_history.append({"role": "assistant", "content": response_text})
-        cl.user_session.set("chat_history", chat_history)
-
-        logger.info("Response sent to user")
-
-    except Exception as e:
-        error_msg = f"Sorry, I encountered an error: {str(e)}"
-        logger.error(f"Error generating response: {e}")
-
-        # Correct way to update a message
-        msg.content = error_msg
-        await msg.update()
-
-        # Add error message to chat history
-        chat_history.append({"role": "assistant", "content": error_msg})
-        cl.user_session.set("chat_history", chat_history)
+if __name__ == "__main__":
+    # This block will be executed when running the script directly
+    print("Starting Gynecologist Assistant AI...")
+    # Chainlit will handle the actual execution
