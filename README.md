@@ -1,8 +1,7 @@
 # Gynecologist Assistant AI
 
 A specialized AI chatbot providing gynecology-related information and assistance using Google's Gemini model and the Chainlit framework.
-
-![Gynecologist Assistant](https://api.placeholder.com/800/400)
+![Image](https://github.com/user-attachments/assets/38dc34c9-5964-45b1-aaa1-3b13b7643558)
 
 ## 🌟 Features
 
