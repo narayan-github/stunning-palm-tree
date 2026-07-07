@@ -22,8 +22,8 @@ A specialized AI chatbot providing gynecology-related information and assistance
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/narayan-github/stunning-palm-tree.git
-   cd stunning-palm-tree
+   git clone https://github.com/narayan-github/gynecology-assistant-ai.git
+   cd gynecology-assistant-ai
    ```
 
 2. **Set up a virtual environment**

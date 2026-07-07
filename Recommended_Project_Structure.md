@@ -3,7 +3,7 @@
 For better maintainability, I recommend reorganizing your files into the following structure:
 
 ```
-stunning-palm-tree/
+gynecology-assistant-ai/
 ├── app.py                       # Main application entry point
 ├── .env                         # Environment variables (not tracked in git)
 ├── .env.example                 # Example environment variables for documentation
